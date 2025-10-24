@@ -1,1 +1,307 @@
+\documentclass[12pt, a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[french]{babel}
+\usepackage[a4paper, margin=1in]{geometry}
+\usepackage{xcolor}
+\usepackage{listings}
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.98,0.98,0.97}
 
+\lstdefinestyle{pythonstyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{blue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=4,
+    frame=single,
+    rulecolor=\color{black!30},
+    title=\lstname,
+    literate=
+        {é}{{\'e}}1 {è}{{\`e}}1 {ê}{{\^e}}1 {ë}{{\"e}}1
+        {à}{{\`a}}1 {â}{{\^a}}1 {ä}{{\"a}}1
+        {î}{{\^i}}1 {ï}{{\"i}}1
+        {ô}{{\^o}}1 {ö}{{\"o}}1
+        {û}{{\^u}}1 {ü}{{\"u}}1 {ù}{{\`u}}1
+        {ç}{{\c c}}1 {Ç}{{\c C}}1
+}
+\lstset{style=pythonstyle}
+
+\begin{document}
+
+\textbf{Problème algorithmique} : étant donné une chaîne de caractères \texttt{s}, renvoyer la plus longue sous-chaîne palindrome dans \texttt{s}.
+
+\paragraph{Exemple concret :}
+\begin{itemize}
+    \item \textbf{Entrée :} \texttt{s = "babad"}
+    \item \textbf{Sortie :} \texttt{"bab"} (Note : \texttt{"aba"} est aussi une réponse valide).
+    \item \textbf{Entrée :} \texttt{s = "cbbd"}
+    \item \textbf{Sortie :} \texttt{"bb"}
+\end{itemize}
+
+
+\section*{Solution 1}
+
+Le code ci-dessous propose une solution brute-force qui teste toutes les sous-chaînes possibles de la chaîne d'entrée, vérifie si elles sont des palindromes, et conserve la plus longue trouvée.
+\vspace{5mm}
+\begin{lstlisting}[language=Python, label={code:palindrome}]
+def is_palindrome(substring):
+    """
+    Vérifie si une chaîne est un palindrome.
+    """
+    for i in range(len(substring)):
+        if substring[i] != substring[-(i+1)]:
+            return False
+    return True
+
+def longestPalindrome(s):
+    """
+    Trouve la plus longue sous-chaîne palindrome dans s.
+    """
+    longest = 0
+    longest_substring = ""
+
+    # Générer toutes les sous-chaînes possibles
+    for i in range(len(s) + 1):
+        for j in range(i, len(s) + 1):
+            substring = s[i:j]
+
+            # Vérifier si la sous-chaîne est un palindrome
+            if is_palindrome(substring):
+                
+                # Mettre à jour si c'est la plus longue trouvée
+                if len(substring) > longest:
+                    longest = len(substring)
+                    longest_substring = substring
+
+    print(f"La plus longue sous-chaîne palindrome est : '{longest_substring}'")
+    return longest_substring
+
+\end{lstlisting}
+
+\section*{Solution 2}
+
+Cette seconde solution est également une approche par force brute, très similaire à la première. Elle génère toutes les sous-chaînes possibles et vérifie pour chacune si elle est un palindrome, en conservant la plus longue trouvée.
+
+Une légère optimisation a été apportée à la fonction \texttt{is\_palindrome} : elle ne parcourt que la moitié de la chaîne de caractères, car vérifier la symétrie sur une moitié suffit à déterminer si c'est un palindrome.
+\vspace{2mm}
+\begin{lstlisting}[language=Python, label={code:palindrome2}]
+def is_palindrome(substring):
+    #  Inutile de faire le test deux fois
+    for i in range(len(substring) // 2):
+        if substring[i] != substring[-(i+1)]:
+            return False
+    return True
+
+def longestPalindrome(s):
+    n = len(s)
+    longest_substring = ""
+
+    # On parcourt toutes les substrings possibles
+    for i in range(n):
+        for j in range(i, n):
+            substring = s[i:j+1]
+
+
+            if is_palindrome(substring):
+                if len(substring) > len(longest_substring):
+                    longest_substring = substring
+
+    print(longest_substring)
+    return longest_substring
+\end{lstlisting}
+\newpage
+\section*{Solution 3}
+
+Une troisième approche beaucoup plus optimisée. Au lieu de générer toutes les sous-chaînes, elle part du principe que chaque palindrome a un centre. Ce centre peut être un seul caractère (pour les palindromes de longueur impaire comme \texttt{"aba"}) ou l'espace entre deux caractères (pour les longueurs paires comme \texttt{"abba"}).
+
+L'algorithme parcourt la chaîne une seule fois. Pour chaque position, il la considère comme un centre potentiel et "étend" la vérification vers l'extérieur (gauche et droite) tant que les caractères correspondent. Il fait cela pour les deux cas (longueur paire et impaire) et conserve le plus long palindrome trouvé. Bien que sa complexité temporelle soit toujours O(N²), cette méthode est nettement plus rapide en pratique que les approches par force brute.
+\vspace{2mm}
+\begin{lstlisting}[language=Python, label={code:palindrome3}]
+def expand_around_center(s, left, right):
+    # renvoie le plus long palindrome a partir d un caractere , O(n)
+    while left >= 0 and right < len(s) and s[left] == s[right]:
+        left -= 1
+        right += 1
+    return s[left + 1:right]
+
+
+def longestPalindrome(s):
+
+    if not s:
+        return ""
+
+    longest_substring = ""
+
+    for i in range(len(s)):
+        # distinction des cas pairs et impairs
+        odd_palindrome = expand_around_center(s,i, i)
+        even_palindrome = expand_around_center(s,i, i + 1)
+
+        longest_substring = max(longest_substring, odd_palindrome, even_palindrome, key=len)
+
+    print(longest_substring)
+    return longest_substring
+\end{lstlisting}
+
+\clearpage
+
+\section*{Solution 4}
+
+Cette méthode s'appuie sur des opérations matricielles avec NumPy : au lieu de tester chaque centre séparément en Python, on traduit la séquence en un vecteur d'entiers puis on effectue des comparaisons décalées et des opérations booléennes sur des tableaux entiers.
+
+\paragraph{Encodage des symboles.} Pour pouvoir comparer rapidement des éléments quelconques (caractères d'une chaîne ou éléments d'une séquence de \texttt{hashable}) avec les opérateurs vectoriels de NumPy, la fonction \texttt{\_encode\_labels} mappe chaque symbole sur un entier $0,\dots,\sigma-1$. Le résultat est un tableau entier \texttt{lab} de longueur $N$ qui sert de représentation compacte et comparable des symboles originaux.
+
+\paragraph{Comparaisons par décalages (shifts).} Un palindrome centré en $c$ de rayon $k$ impose que, pour tout $t\in\{1,\dots,k\}$, on ait \(\texttt{lab}[c-t]=\texttt{lab}[c+t]\) (cas impair) ou \(\texttt{lab}[c-t+1]=\texttt{lab}[c+t]\) (cas pair). Plutôt que de tester chaque centre séparément, on calcule pour chaque pas $k$ un masque booléen \texttt{eq} qui compare en une seule opération vectorielle deux tranches décalées de \texttt{lab} (par exemple \texttt{lab[:-2*k]} et \texttt{lab[2*k:]}). Ce masque indique simultanément, pour tous les centres valides à ce pas, si la paire distante $k$ correspond.
+
+\paragraph{Accumulation des runs.} Pour savoir si un palindrome s'étend d'au moins $k$ autour d'un centre donné, on maintient un tableau booléen \texttt{run\_odd} (resp. \texttt{run\_even}) qui représente si toutes les comparaisons pour les pas $1,\dots,k$ ont été vraies. À chaque itération sur $k$ on met à jour ce masque (en excluant soigneusement les indices hors-bord) puis on l'ajoute à un accumulateur entier \texttt{R\_odd} (resp. \texttt{R\_even}) : cet accumulateur compte le nombre de pas consécutifs satisfaits, soit littéralement le rayon du palindrome pour chaque centre.
+
+\paragraph{Reconstruction du meilleur palindrome.} Après avoir traité tous les pas $k$, les rayons sont convertis en longueurs via \(L_{\text{odd}}=2R_{\text{odd}}+1\) et \(L_{\text{even}}=2R_{\text{even}}\). On identifie la longueur maximale parmi les cas pairs et impairs, on récupère le centre correspondant et son rayon, puis on reconstruit les indices de début et de fin du meilleur palindrome. Si l'entrée était une chaîne, la méthode renvoie aussi la sous-chaîne correspondante ; sinon elle renvoie "\texttt{None}".
+
+\paragraph{Complexité et limites.} L'algorithme réalise en pratique $O(N^2)$ comparaisons élémentaires (pour tous les pas $k$ et centres valides), mais ces comparaisons et masques sont vectorisés et exécutés en C par NumPy, ce qui réduit fortement le coût d'interprétation Python. La mémoire principale reste $O(N)$ pour \texttt{lab}, \texttt{R\_*} et \texttt{run\_*}, toutefois des tableaux temporaires \texttt{eq} de taille $\approx N$ sont alloués à chaque pas — attention donc aux très longues séquences.
+
+
+\begin{lstlisting}[language=Python, label={code:palindrome4}]
+def _encode_labels(seq):
+    m = {}
+    lab = np.empty(len(seq), dtype=np.int32)
+    for i, x in enumerate(seq):
+        lab[i] = m.setdefault(x, len(m))
+    return lab
+
+def longest_palindrome_matrix(seq):
+    """
+    Matrix/shift-based longest palindromic substring.
+    Returns: (start, end_exclusive, length, substring_if_str_else_None)
+    """
+    N = len(seq)
+    is_str = isinstance(seq, str)
+    if N == 0: return (0, 0, 0, "" if isinstance(seq, str) else None)
+    lab = _encode_labels(seq if not is_str else seq)
+
+    # 1) Cas impair
+    R_odd = np.zeros(N, dtype=np.int32)       # radius per center
+    run_odd = np.zeros(N, dtype=bool)
+    for k in range(1, N):                     # k = radius step
+        m = N - 2 * k                         
+        if m <= 0:
+            break
+        eq = (lab[:-2*k] == lab[2*k:])        # eq for centers k..N-k-1
+        if k == 1:
+            run_odd.fill(False)
+            run_odd[k:N-k] = eq
+        else:
+            run_odd[:k] = False
+            run_odd[N-k:] = False
+            run_odd[k:N-k] &= eq
+        R_odd += run_odd
+
+    L_odd = 2 * R_odd + 1
+    odd_len = int(L_odd.max())
+    odd_center = int(L_odd.argmax())
+    odd_r = int(R_odd[odd_center])
+
+    # 2) Cas pair
+    if N >= 2:
+        R_even = np.zeros(N - 1, dtype=np.int32)
+        run_even = np.zeros(N - 1, dtype=bool)
+        for k in range(1, N // 2 + 1):
+            m = N - 2 * k + 1
+            if m <= 0:
+                break
+            eq = (lab[:m] == lab[2*k - 1:])   # centres (k-1)..(N-k-1)
+            if k == 1:
+                run_even.fill(False)
+                run_even[k-1:N-k] = eq
+            else:
+                run_even[:k-1] = False
+                run_even[N-k:] = False
+                run_even[k-1:N-k] &= eq
+            R_even += run_even
+
+        L_even = 2 * R_even
+        even_len = int(L_even.max()) if L_even.size else 0
+        even_center = int(L_even.argmax()) if L_even.size else 0
+        even_r = int(R_even[even_center]) if R_even.size else 0
+    else:
+        even_len = 0
+        even_center = 0
+        even_r = 0
+
+    # 3) Sélectionner les meilleurs indices et les reconstruire
+    if odd_len >= even_len:
+        start = odd_center - odd_r
+        end = odd_center + odd_r + 1
+        best_len = odd_len
+    else:
+        c = even_center
+        r = even_r
+        start = c - r + 1
+        end = c + r + 1
+        best_len = even_len
+
+    sub = seq[start:end] if is_str else None
+    return (start, end, best_len, sub)
+\end{lstlisting}
+\clearpage
+\section*{Solution 5}
+
+Manacher transforme le problème en un cadre unifié pour palindromes de longueur paire et impaire grâce à un séparateur (\#) inséré entre les caractères et des sentinelles aux extrémités. On maintient :
+\begin{itemize}
+  \item un tableau $P$ où $P[i]$ est le \emph{rayon} (nombre de caractères appariés de part et d'autre) du plus long palindrome centré en $i$ dans la chaîne transformée,
+  \item un centre courant $c$ et une frontière droite $r$ du palindrome le plus à droite déjà trouvé,
+  \item la symétrie: pour un index $i$ à l'intérieur de $[\,\cdot, r)$, son miroir par rapport à $c$ est $i' = 2c - i$, ce qui donne une borne initiale $P[i] \ge \min(r-i, P[i'])$.
+\end{itemize}
+On étend ensuite naïvement autour de $i$ au-delà de $r$ si possible. Le tout est linéaire, car chaque caractère ne déclenche qu'un nombre amorti constant d'extensions.
+\vspace{5mm}
+
+\begin{lstlisting}[language=Python, label={code:palindrome4}]
+def longest_palindrome(s: str) -> str:
+    if not s: return ""
+    t = '^#' + '#'.join(s) + '#$'       # sentinelles + séparateurs
+    P, c, r = [0]*len(t), 0, 0
+    for i in range(1, len(t)-1):
+        if i < r: P[i] = min(r - i, P[2*c - i])
+        while t[i + P[i] + 1] == t[i - P[i] - 1]:
+            P[i] += 1
+        if i + P[i] > r: c, r = i, i + P[i]
+    m, i = max((n, i) for i, n in enumerate(P))
+    return s[(i - m)//2 : (i + m)//2]
+\end{lstlisting}
+
+\textbf{Prétraitement} : on construit \lstinline{t = '^#' + '#'.join(s) + '#$'} afin de gérer uniformément les palindromes pairs et impairs, tout en évitant les tests de bornes.  
+
+\textbf{Structures} (\lstinline{P, c, r}) :  
+\begin{itemize}
+  \item \lstinline{P[i]} = rayon du plus long palindrome centré en \lstinline{i} dans \lstinline{t},
+  \item \lstinline{c} = centre du palindrome actif le plus à droite,
+  \item \lstinline{r} = position de sa frontière droite.
+\end{itemize}
+
+\textbf{Initialisation par symétrie} (\lstinline{if i < r: ...}) : si \lstinline{i} est sous la cloche courante, on initialise \lstinline{P[i]} à \(\min(r - i, P[2 * c - i])\), grâce au miroir \(\,i' = 2c - i\).  
+
+\textbf{Extension} (boucle \lstinline{while}) : on agrandit le palindrome centré en \lstinline{i} tant que les caractères situés de part et d’autre du centre sont égaux.  
+
+\textbf{Mise à jour} (\lstinline{if i + P[i] > r: ...}) : si l’on dépasse \lstinline{r}, le palindrome courant devient la nouvelle cloche \lstinline{(c, r)}.  
+
+\textbf{Extraction du résultat} : on prend le maximum \lstinline{m} de \lstinline{P} (le rayon) et son centre \lstinline{i}. Dans la chaîne originale \texttt{s}, l’indice de début vaut \((i - m) // 2\) et la fin \((i + m) // 2\). On renvoie donc \lstinline{s[(i - m)//2 : (i + m)//2]}.
+
+\textbf{Remarques sur la complexité de cet algo}\newline
+L’initialisation par miroir ne sous-estime jamais le vrai rayon car elle est bornée par \lstinline{r - i}, et elle ne nécessite des extensions que \emph{au-delà} de \lstinline{r}. Le maximum de \lstinline{P} permet d’identifier un centre optimal, et la conversion d’indices est correcte puisque chaque caractère de \texttt{s} correspond à une position impaire de \texttt{t}.  
+Concernant la complexité, l’algorithme s’exécute en temps \(O(n)\) et utilise un espace \(O(n)\), avec \(n = |\texttt{s}|\). Chaque position augmente \lstinline{r} au plus une seule fois, et les comparaisons effectuées hors symétrie sont amorties.
+
+\end{document}
