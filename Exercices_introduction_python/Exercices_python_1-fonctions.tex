@@ -1,0 +1,178 @@
+\documentclass[11pt,a4paper]{article}
+
+% --- Encodage & langue ---
+\usepackage[utf8]{inputenc}   % si vous compilez en pdfLaTeX
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{microtype}
+\usepackage{upquote}          % guillemets droits en \ttfamily
+
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{stmaryrd} % pour \llbracket \rrbracket
+\usepackage{xcolor}
+
+% --- Listings (avec support UTF-8) ---
+\usepackage{listings}
+\usepackage{listingsutf8}     % <— rend listings compatible UTF-8
+\lstset{
+  inputencoding=utf8,         % <— crucial pour les accents dans les blocs
+  extendedchars=true
+}
+
+% Fallback robuste si certains glyphes posent problème :
+% (vous pouvez commenter cette section si tout compile sans)
+\lstset{literate=
+  {é}{{\'e}}1 {è}{{\`e}}1 {ê}{{\^e}}1 {ë}{{\"e}}1
+  {É}{{\'E}}1 {È}{{\`E}}1 {Ê}{{\^E}}1 {Ë}{{\"E}}1
+  {à}{{\`a}}1 {â}{{\^a}}1 {ä}{{\"a}}1 {À}{{\`A}}1 {Â}{{\^A}}1 {Ä}{{\"A}}1
+  {î}{{\^i}}1 {ï}{{\"i}}1 {Î}{{\^I}}1 {Ï}{{\"I}}1
+  {ô}{{\^o}}1 {ö}{{\"o}}1 {Ô}{{\^O}}1 {Ö}{{\"O}}1
+  {ù}{{\`u}}1 {û}{{\^u}}1 {ü}{{\"u}}1 {Ù}{{\`U}}1 {Û}{{\^U}}1 {Ü}{{\"U}}1
+  {ç}{{\c c}}1 {Ç}{{\c C}}1
+  {œ}{{\oe}}1 {Œ}{{\OE}}1
+  {æ}{{\ae}}1 {Æ}{{\AE}}1
+}
+
+% --- Palette douce et foncée pour le code ---
+\definecolor{pyKeyword}{HTML}{1A4D8F} % bleu profond
+\definecolor{pyComment}{HTML}{2F703E} % vert foncé/grisé
+\definecolor{pyString}{HTML}{8B2F2F}  % rouge brique foncé
+\definecolor{pyNumber}{HTML}{5E3D99}  % violet/gris
+\definecolor{pyBack}{HTML}{F4F5F7}    % fond gris très clair
+\definecolor{pyFrame}{HTML}{C0C4C7}   % gris du cadre
+\definecolor{pyLineNo}{HTML}{7A7D80}  % gris des numéros
+
+% --- Style listings : largeur bornée + retour à la ligne + couleurs sobres ---
+\lstdefinestyle{pycorrige}{
+  language=Python,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{pyKeyword}\bfseries,
+  commentstyle=\color{pyComment}\itshape,
+  stringstyle=\color{pyString},
+  numberstyle=\scriptsize\color{pyLineNo},
+  numbers=left,
+  stepnumber=1,
+  numbersep=8pt,
+  showstringspaces=false,
+  columns=fullflexible,
+  frame=single,
+  rulecolor=\color{pyFrame},
+  backgroundcolor=\color{pyBack},
+  framerule=0.3pt,
+  aboveskip=.85\baselineskip,
+  belowskip=.6\baselineskip,
+  linewidth=\linewidth,
+  breaklines=true,
+  breakatwhitespace=true,
+  keepspaces=true,
+  tabsize=2,
+  emph={len,range,filter,map,all,any,list,set,dict,print,zip,enumerate,isinstance},
+  emphstyle=\color{pyNumber}\bfseries
+}
+
+% Appliquer ce style par défaut à tous les listings
+\lstset{style=pycorrige}
+
+% --- Petite macro pour les titres de corrigés avec espace vertical net ---
+\newcommand{\excorr}[1]{%
+  \vspace{.6\baselineskip}%
+  \noindent\textbf{Exercice #1.}\par
+  \vspace{.4\baselineskip}%
+}
+
+\title{Exercices Python : fonctions \texttt{lambda} et compréhensions de liste}
+\date{}
+
+\begin{document}
+\maketitle
+
+\subsection*{Exercice 1}
+Considérez la fonction $f$ qui prend en entrée (en arguments) deux nombres $x$ et $y$ et qui ressort (en \emph{output}) leur somme ($x+y$).
+Proposez deux manières de définir cette fonction $f$ : la première avec \texttt{def} et la seconde avec \texttt{lambda}.
+
+\subsection*{Exercice 2}
+Supposez que vous avez défini une liste $E$ et une propriété booléenne $P(x)$.
+\begin{enumerate}
+  \item Définissez en compréhension la liste des éléments de $E$ qui vérifient $P$.
+  \item Construisez la même liste en utilisant \texttt{filter} et \texttt{list}.
+\end{enumerate}
+
+\subsection*{Exercice 3}
+Considérez une liste de mots appelée \texttt{mots} (par exemple \texttt{mots = ["chèvre", "loutre", "chats", \dots]}).
+Définissez en compréhension une liste de nombres entiers nommée \texttt{length\_mots} contenant les longueurs des mots contenus dans la liste \texttt{mots}.
+
+\subsection*{Exercice 4}
+Considérez l’ensemble des entiers premiers défini en compréhension :
+\[
+\mathcal{P} \;=\; \left\{\, x \in \mathbb{N} \ \middle|\ x>1 \ \text{ et }\ \forall\, y \in \llbracket 2,\ \lfloor \sqrt{x} \rfloor \rrbracket,\ x \not\equiv 0 \pmod{y} \right\}.
+\]
+
+Définissez en Python la fonction booléenne \texttt{is\_prime} au moyen d’une expression \texttt{lambda n: \dots} qui traduit les conditions d’appartenance ci-dessus, avec la définition par cas :
+\[
+\texttt{is\_prime}(n)=
+\begin{cases}
+\texttt{True} & \text{si } n\in\mathcal{P},\\
+\texttt{False} & \text{sinon.}
+\end{cases}
+\]
+
+Indications :
+\begin{itemize}
+  \item Transcrivez « $\forall\, y \in \llbracket 2,\ \lfloor \sqrt{n} \rfloor \rrbracket$ » par \texttt{all(condition for y in range(...))}, qui renvoie \texttt{True} si la \texttt{condition} est vraie pour tous les \texttt{y}.
+  \item Itérez jusqu'à $\lfloor \sqrt{n} \rfloor$ avec \texttt{range(2, isqrt(n) + 1)}.
+  \item $\lfloor \sqrt{n} \rfloor$ est la partie entière de la racine carrée (arrondie à l'entier inférieur).
+\end{itemize}
+
+\subsection*{Exercice 5}
+Utilisez la fonction \texttt{is\_prime(n)} définie dans l'exercice 4 pour définir la liste des entiers premiers inférieurs à $1000$ de deux manières différentes.
+
+\bigskip
+\begin{center}
+\subsection*{Corrigés}
+\end{center}
+
+\excorr{1}
+\begin{lstlisting}
+# Avec def
+def f(x, y):
+    return x + y
+
+# Avec lambda
+f = lambda x, y: x + y
+\end{lstlisting}
+
+\excorr{2}
+On suppose que E (itérable/ensemble) et P (fonction booléenne) sont déjà définis.
+\begin{lstlisting}
+# Compréhension de liste
+L = [x for x in E if P(x)]
+
+# Avec filter + conversion en liste
+L = list(filter(P, E))
+\end{lstlisting}
+
+\excorr{3}
+\begin{lstlisting}
+length_mots = [len(m) for m in mots]
+\end{lstlisting}
+
+\excorr{4}
+\begin{lstlisting}
+from math import isqrt
+
+is_prime = lambda n: (n > 1) and all(n % y != 0 for y in range(2, isqrt(n) + 1))
+\end{lstlisting}
+
+\excorr{5}
+\begin{lstlisting}
+# Par compréhension de liste
+Primes = [n for n in range(2, 1000) if is_prime(n)]
+
+# Avec filter
+Primes = list(filter(is_prime, range(2, 1000)))
+\end{lstlisting}
+
+\end{document}
