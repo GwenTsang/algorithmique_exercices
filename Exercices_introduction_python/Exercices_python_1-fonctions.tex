@@ -1,11 +1,11 @@
 \documentclass[11pt,a4paper]{article}
 
 % --- Encodage & langue ---
-\usepackage[utf8]{inputenc}   % si vous compilez en pdfLaTeX
+\usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[french]{babel}
 \usepackage{microtype}
-\usepackage{upquote}          % guillemets droits en \ttfamily
+\usepackage{upquote}
 
 \usepackage{geometry}
 \geometry{margin=2.5cm}
@@ -16,14 +16,14 @@
 
 % --- Listings (avec support UTF-8) ---
 \usepackage{listings}
-\usepackage{listingsutf8}     % <— rend listings compatible UTF-8
+\usepackage{listingsutf8}
 \lstset{
-  inputencoding=utf8,         % <— crucial pour les accents dans les blocs
+  inputencoding=utf8,
   extendedchars=true
 }
 
 % Fallback robuste si certains glyphes posent problème :
-% (vous pouvez commenter cette section si tout compile sans)
+% commenter cette section si tout compile sans)
 \lstset{literate=
   {é}{{\'e}}1 {è}{{\`e}}1 {ê}{{\^e}}1 {ë}{{\"e}}1
   {É}{{\'E}}1 {È}{{\`E}}1 {Ê}{{\^E}}1 {Ë}{{\"E}}1
