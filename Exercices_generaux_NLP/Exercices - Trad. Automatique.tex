@@ -1,0 +1,189 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[french]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{enumitem}
+\pagestyle{empty}
+\usepackage{pdflscape}
+\usepackage{amsmath, amssymb}
+
+\title{Exercices - Trad. Automatique}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{description}[
+  leftmargin=0pt,
+  style=nextline,
+  font=\normalfont,
+  itemsep=1.0\baselineskip,
+  parsep=0pt
+]
+  \item[\textbf{Exercice 1}] Distinguez trois types de modèles dans le NLP.
+
+  \item[\textbf{Exercice 2}] Expliquez simplement ce qu'est un Réseau de Neurones Récurrents.
+
+  \item[\textbf{Exercice 3}] Distinguez \textbf{position absolue} et \textbf{position relative} d'un token dans une séquence.
+
+  \item[\textbf{Exercice 4}] Qu'est-ce que le \emph{Byte Pair Encoding} (BPE)\,?
+
+  \item[\textbf{Exercice 5}] Dans le contexte des datasets pour l’entraînement de modèles NLP de traduction automatique, comment distingue-t-on \textbf{corpus parallèles/alignés} et \textbf{corpus comparables}~? Dans quelle catégorie range-t-on \textit{Wikipedia} ?
+
+  \item[\textbf{Exercice 6}] Comment distingue-t-on l’\textbf{auto-attention} (self-attention) de la \textbf{cross-attention} ?
+
+  \item[\textbf{Exercice 7}] a) Quelle est la formule permettant de calculer le score de précision BLEU entre une traduction candidate et une traduction de référence ? 
+  \\
+  \\
+  b) Prenez les deux phrases \textbf{« le chat mange »} et \textbf{« le chat dort »} et exprimez sous la forme d'une fraction le score de précision BLEU en décomposant les phrases en mots.
+    \\
+  \\
+  c) Prenez les deux mêmes phrases et exprimez le score de précision en décomposant les phrases en bigrammes (paires de mots).
+
+\clearpage
+
+\subsection*{Corrigé ex.~1}
+
+\textbf{Encodeur seul (encoder-only).}\\
+\emph{Exemple :} BERT.\\
+\emph{Objectif d’entraînement :} \textbf{MLM – Masked Language Modeling} (prédire des tokens masqués).\\
+\emph{Usage typique :} compréhension du texte (classification, NER, recherche sémantique).
+
+\medskip
+
+\textbf{Décodeur seul (decoder-only).}\\
+\emph{Exemples :} EuroLLM, GPT, LLaMA, Mistral.\\
+\emph{Objectif d’entraînement :} \textbf{autoregressif} (prédire le prochain jeton).\\
+\emph{Usage typique :} génération de texte, complétion, agents conversationnels.
+
+\medskip
+
+\textbf{Encodeur--décodeur (seq2seq).}\\
+\emph{Exemple :} T5.\\
+\emph{Objectif d’entraînement :} \textbf{modélisation conditionnelle} (apprendre $p(y \mid x)$), souvent via des tâches de débruitage / \emph{denoising}.\\
+\emph{Usage typique :} traduction, résumé, réécriture, question-réponse extractive / générative.
+
+\subsection*{Corrigé ex.~2}
+
+L’idée d’un RNN, c’est de prédire, de proche en proche, le mot suivant, en s’appuyant sur un état intermédiaire caché. La prédiction se fait donc de manière séquentielle, ce qui a pour effet de réduire la capacité de ces modèles à encapsuler du contexte. Cet inconvénient est compensé en partie par de la rétropropagation.
+
+\subsection*{Corrigé ex.~3}
+
+La \textbf{position absolue} correspond à la position du token dans la séquence (par exemple, c'est le $i$-ème token de la séquence). La \textbf{position relative} correspond à la position d'un token par rapport à un autre. Typiquement, si $p$ est la position absolue d'un token et $q$ celle d'un autre, la position relative est $\lvert p - q\rvert$.
+
+\subsection*{Corrigé ex.~4}
+
+Le \textbf{Byte Pair Encoding (BPE)} est une idée simple utilisée à l’origine pour la \textbf{compression} et devenue très populaire en \textbf{traitement du langage naturel} pour créer des \textbf{sous-mots (subwords)} et pour tokeniser.
+
+\medskip
+\noindent\textbf{Principe (apprentissage du vocabulaire).}
+\begin{enumerate}[leftmargin=*]
+  \item On part d’une séquence de symboles (au départ, des \textbf{caractères}).
+  \item On \textbf{compte} les paires de symboles adjacentes les plus fréquentes.
+  \item On \textbf{fusionne} la paire la plus fréquente en un \textbf{nouveau symbole}.
+  \item On \textbf{répète} ces fusions un certain nombre de fois (ou jusqu’à ce qu’il n’y ait plus de gains).
+\end{enumerate}
+
+\noindent En NLP, on applique ce procédé sur un corpus pour apprendre un \textbf{vocabulaire} de sous-mots. Ensuite, pour tokeniser un texte, on refait les mêmes fusions dans le même ordre~: les mots rares sont découpés en morceaux fréquents.
+
+\subsection*{Corrigé ex.~5}
+
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Corpus parallèle / aligné}\\
+  Deux (ou plus) collections de textes qui sont \textbf{des traductions l’une de l’autre}, alignées au \textbf{moins au niveau phrase} (souvent segment ou mot via alignements).\\
+  \emph{Exemples :} Europarl, OpenSubtitles (après alignement).\\
+  \emph{Usage typique :} entraînement/évaluation directe de modèles de traduction (supervisée), extraction de lexiques bilingues.
+
+  \item \textbf{Corpus comparable}\\
+  Collections de textes dans différentes langues qui \textbf{traitent des mêmes thèmes/domaines/époques} mais \textbf{ne sont pas des traductions} entre elles (pas d’alignement phrase-à-phrase garanti).\\
+  \emph{Exemples :} articles de presse du même jour dans plusieurs langues, articles \textit{Wikipedia}.\\
+  \emph{Usage typique :} pré-entraînement, adaptation domaine/registre, induction lexicale, apprentissage semi/auto-supervisé.
+\end{itemize}
+
+\textit{Wikipedia} est majoritairement un corpus comparable.
+
+\clearpage
+\begin{landscape}
+\subsection*{Corrigé ex.~6}
+\begin{table}[ht]
+\centering
+\begin{tabular}{|l|p{7cm}|p{7cm}|}
+\hline
+\textbf{} & \textbf{Auto-attention} & \textbf{Attention croisée} \\
+\hline
+Ce qui fait attention à quoi & Les éléments d'une séquence font attention à eux-mêmes (chaque token regarde les autres tokens de la même séquence). & Les éléments de la séquence A font attention à la séquence B (les tokens d'une séquence cible regardent les tokens d'une séquence source). \\
+\hline
+$Q,K,V$ proviennent de & $Q,K,V$ du même input $X$. & $Q$ de la cible $Y$ ; $K,V$ de la source $X$. \\
+\hline
+Utilisation typique & Construction de représentations au sein d'une entrée : couches d'encodeur dans BERT ; auto-attention causale (masquée) dans les décodeurs & Conditionnement sur un contexte externe : décodeur faisant attention aux sorties de l'encodeur (traduction) \\
+\hline
+Masquage & Peut être bidirectionnel (encodeurs) ou causal/masqué par anticipation (décodeurs). & Généralement pas de masque causal ; peut masquer le padding ou la structure—la visibilité concerne quelles positions sources sont vues, pas les tokens futurs. \\
+\hline
+Complexité & $O(n^2)$ pour une longueur de séquence $n$. & $O(n_{\text{cible}}\cdot n_{\text{source}})$ ; utile quand un côté est court/fixe. \\
+
+\hline
+\end{tabular}
+\end{table}
+\end{landscape}
+\clearpage
+
+\subsection*{Corrigé ex.~7}
+\textbf{a) Formule générale :}
+
+\[
+\text{Précis°}(\text{Candidate}, \text{Target}) =
+\frac{
+\text{nombre de } n\text{-grammes concordants entre Candidate et Target}
+}{
+\text{nombre total de } n\text{-grammes dans Target}
+}
+\]
+
+\textbf{b) Avec des 1-grammes (unigrammes)}
+
+Soit $n = 1$.
+
+\begin{itemize}
+\item \textbf{Candidate} : « le chat mange »
+\item \textbf{Target} : « le chat dort »
+\end{itemize}
+
+1-grammes dans \textit{Candidate} : \{« le », « chat », « mange »\}
+
+1-grammes dans \textit{Target} : \{« le », « chat », « dort »\}
+
+1-grammes concordants : \{« le », « chat »\} $\Rightarrow$ 2 mots en commun
+
+Nombre total de 1-grammes dans \textit{Target} : 3
+
+\[
+\text{Précision} = \frac{2}{3} \approx 0{,}67 = 67\,\%
+\]
+
+\vspace{0.5cm}
+
+\textbf{c) Avec des 2-grammes (bigrammes)}
+\\
+Un bigramme est une paire de mots consécutifs. Ici, $(\textit{le}, \textit{chat})$ est un seul bigramme. Appliquons la formule avec $n = 2$.
+
+\begin{itemize}
+\item \textbf{Candidate} : « le chat mange la souris »
+\item \textbf{Target} : « le chat dort »
+\end{itemize}
+
+2-grammes dans \textit{Candidate} : \{« le chat », « chat mange », « mange la », « la souris »\}
+
+2-grammes dans \textit{Target} : \{« le chat », « chat dort »\}
+
+2-grammes concordants : \{« le chat »\} $\Rightarrow$ 1 bigramme en commun
+
+Nombre total de 2-grammes dans \textit{Target} : 2
+
+\[
+\text{Précision} = \frac{1}{2} = 0{,}5 = 50\,\%
+\]
+
+\end{document}
